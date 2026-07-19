@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Student CRUD</title>
+    <style>
+        /* CSS styles */
+        body { font-family: Arial, sans-serif; margin: 30px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { text-align: center; }
+        form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        form input { padding: 10px; flex: 1; min-width: 150px; border: 1px solid #ccc; border-radius: 4px; }
+        form button { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        form button.cancel { background-color: #6c757d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .btn-edit { background-color: #ffc107; color: black; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; margin-right: 5px;}
+        .btn-delete { background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Student Management System (CRUD)</h2>
+    
+    <form id="studentForm">
+        <input type="hidden" id="studentId">
+        <input type="text" id="name" placeholder="Full Name" >
+        <input type="email" id="email" placeholder="Email Address" >
+        <input type="text" id="course" placeholder="Course" >
+        <button type="submit" id="submitBtn">Add Student</button>
+        <button type="button" id="cancelBtn" class="cancel" style="display:none;" onclick="resetForm()">Cancel</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    // JavaScript for handling CRUD operations
+    const API_URL = 'api.php'; // backend API endpoint
+
+    // Get references to the form and buttons
+    // - studentForm is the form for adding/editing students, 
+    // - submitBtn is the button to submit the form, 
+    // - cancelBtn is the button to cancel editing.
+    const form = document.getElementById('studentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    // Fetch and display students on page load
+    document.addEventListener("DOMContentLoaded", fetchStudents);
+
+    // Function to fetch and display students
+    async function fetchStudents() {
+        const response = await fetch(API_URL);
+        const students = await response.json();
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = '';
+
+        students.forEach(student => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.course}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editStudent(${student.id}, '${student.name}', '${student.email}', '${student.course}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteStudent(${student.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Handle Form Submit (Create or Update)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const id = document.getElementById('studentId').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const course = document.getElementById('course').value;
+
+        // Prepare payload and determine method (POST for create, PUT for update)
+        // Payload is a term for the data we are sending to the server. 
+        const payload = { name, email, course };
+        let method = 'POST';
+
+        if (id) {
+            // This means we are updating an existing student, so we include the ID in the payload and change the method to PUT.
+            payload.id = id;
+            method = 'PUT';
+        }
+
+        // fetch API with the appropriate method and payload
+        // This will send the data to the backend API and handle the response.
+        // Allows the web page to talk to the server-side PHP script to perform CRUD operations.
+        const response = await fetch(API_URL, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        // Handle the response from the server
+        const result = await response.json();
+        alert(result.message || result.error);
+        
+        resetForm(); // Clear the form after submission
+        fetchStudents(); // Refresh the student list to show the latest data
+    });
+
+    // Setup form for editing
+    function editStudent(id, name, email, course) {
+        document.getElementById('studentId').value = id;
+        document.getElementById('name').value = name;
+        document.getElementById('email').value = email;
+        document.getElementById('course').value = course;
+        
+        // Change the submit button text and style to indicate update mode
+        submitBtn.innerText = "Update Student"; 
+        submitBtn.style.backgroundColor = "#ffc107";
+        submitBtn.style.color = "black";
+        cancelBtn.style.display = "inline-block";
+    }
+
+    // Delete a student
+    async function deleteStudent(id) {
+        if (confirm("Are you sure you want to delete this student?")) {
+            const response = await fetch(API_URL, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            fetchStudents();
+        }
+    }
+
+    // Reset Form
+    function resetForm() {
+        form.reset();
+        document.getElementById('studentId').value = '';
+        submitBtn.innerText = "Add Student";
+        submitBtn.style.backgroundColor = "#28a745";
+        submitBtn.style.color = "white";
+        cancelBtn.style.display = "none";
+    }
+</script>
+</body>
+</html>
