@@ -3,253 +3,163 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CampusLoan &mdash; Student Loan Management</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Simple Student CRUD</title>
 
     <!-- External CSS -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div class="app">
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark">CL</span>
-          <div class="brand-text">
-            <h1>CampusLoan</h1>
-            <p>Student loan &amp; repayment tracker</p>
-          </div>
-        </div>
-        <nav class="tabs" id="tabs">
-          <button class="tab-btn is-active" data-tab="students" type="button">
-            <span class="tab-index">01</span> Students
-          </button>
-          <button class="tab-btn" data-tab="loans" type="button">
-            <span class="tab-index">02</span> Loans
-          </button>
-          <button class="tab-btn" data-tab="payments" type="button">
-            <span class="tab-index">03</span> Payments
-          </button>
-        </nav>
-      </header>
+    <div class="container">
+      <h2>Student Management System (CRUD)</h2>
 
-      <main>
-        <!-- ============ STUDENTS TAB ============ -->
-        <section class="panel is-active" id="tab-students">
-          <div class="card form-card">
-            <h2>Add / Update Student</h2>
-            <form id="studentForm">
-              <input type="hidden" id="studentId" />
+      <form id="studentForm">
+        <input type="hidden" id="studentId" />
 
-              <div class="field">
-                <label for="name">Full name</label>
-                <input type="text" id="name" placeholder="Juan Dela Cruz" required />
-              </div>
-              <div class="field">
-                <label for="email">Email address</label>
-                <input type="email" id="email" placeholder="juan@school.edu" required />
-              </div>
-              <div class="field">
-                <label for="course">Course</label>
-                <input type="text" id="course" placeholder="BS Computer Science" required />
-              </div>
+        <input type="text" id="name" placeholder="Full Name" />
+        <input type="email" id="email" placeholder="Email Address" />
+        <input type="text" id="course" placeholder="Course" />
 
-              <div class="form-actions">
-                <button type="submit" id="submitBtn" class="btn btn-primary">Add Student</button>
-                <button type="button" id="cancelBtn" class="btn btn-ghost" style="display: none">
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+        <button type="submit" id="submitBtn">Add Student</button>
 
-          <div class="card table-card">
-            <div class="card-heading">
-              <h2>Students</h2>
-              <span class="count-pill" id="studentCount">0</span>
-            </div>
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Course</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="studentTableBody">
-                  <tr class="empty-row"><td colspan="5">Loading students&hellip;</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <button
+          type="button"
+          id="cancelBtn"
+          class="cancel"
+          style="display: none"
+          onclick="resetForm()"
+        >
+          Cancel
+        </button>
+      </form>
 
-        <!-- ============ LOANS TAB ============ -->
-        <section class="panel" id="tab-loans">
-          <div class="card selector-card">
-            <h2>Select a student</h2>
-            <div class="field">
-              <label for="loanStudentSelect">Student</label>
-              <select id="loanStudentSelect">
-                <option value="">Choose a student&hellip;</option>
-              </select>
-            </div>
-          </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-          <div class="card form-card" id="loanFormCard">
-            <h2>New Loan</h2>
-            <form id="loanForm">
-              <div class="field">
-                <label for="loanAmount">Amount (&#8369;)</label>
-                <input type="number" id="loanAmount" min="0" step="0.01" placeholder="15000.00" required />
-              </div>
-              <div class="field">
-                <label for="loanType">Loan type</label>
-                <select id="loanType" required>
-                  <option value="Tuition">Tuition</option>
-                  <option value="Books">Books</option>
-                  <option value="Living Expenses">Living Expenses</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="loanStatus">Status</label>
-                <select id="loanStatus" required>
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Disbursed">Disbursed</option>
-                </select>
-              </div>
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Add Loan</button>
-              </div>
-            </form>
-          </div>
-
-          <div class="card table-card">
-            <div class="card-heading">
-              <h2>Loans</h2>
-              <span class="count-pill" id="loanCount">0</span>
-            </div>
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="loanTableBody">
-                  <tr class="empty-row"><td colspan="5">Select a student to view loans.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ PAYMENTS TAB ============ -->
-        <section class="panel" id="tab-payments">
-          <div class="card selector-card">
-            <h2>Select a loan</h2>
-            <div class="field">
-              <label for="paymentStudentSelect">Student</label>
-              <select id="paymentStudentSelect">
-                <option value="">Choose a student&hellip;</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="paymentLoanSelect">Loan</label>
-              <select id="paymentLoanSelect" disabled>
-                <option value="">Choose a student first&hellip;</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="card summary-card" id="summaryCard" hidden>
-            <h2>Repayment progress</h2>
-            <div class="summary-figures">
-              <div>
-                <span class="summary-label">Loan amount</span>
-                <span class="summary-value" id="summaryLoanAmount">&#8369;0.00</span>
-              </div>
-              <div>
-                <span class="summary-label">Total paid</span>
-                <span class="summary-value summary-value--paid" id="summaryPaid">&#8369;0.00</span>
-              </div>
-              <div>
-                <span class="summary-label">Remaining balance</span>
-                <span class="summary-value summary-value--balance" id="summaryBalance">&#8369;0.00</span>
-              </div>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-            <span class="progress-pct" id="progressPct">0% repaid</span>
-          </div>
-
-          <div class="card form-card" id="paymentFormCard">
-            <h2>Record Payment</h2>
-            <form id="paymentForm">
-              <div class="field">
-                <label for="paymentAmount">Amount (&#8369;)</label>
-                <input type="number" id="paymentAmount" min="0" step="0.01" placeholder="1500.00" required />
-              </div>
-              <div class="field">
-                <label for="paymentDate">Date</label>
-                <input type="date" id="paymentDate" required />
-              </div>
-              <div class="field">
-                <label for="paymentMethod">Method</label>
-                <select id="paymentMethod" required>
-                  <option value="Cash">Cash</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="Online Payment">Online Payment</option>
-                </select>
-              </div>
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Record Payment</button>
-              </div>
-            </form>
-          </div>
-
-          <div class="card table-card">
-            <div class="card-heading">
-              <h2>Payment history</h2>
-              <span class="count-pill" id="paymentCount">0</span>
-            </div>
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th>Method</th>
-                  </tr>
-                </thead>
-                <tbody id="paymentTableBody">
-                  <tr class="empty-row"><td colspan="4">Select a loan to view payments.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        <tbody id="studentTableBody"></tbody>
+      </table>
     </div>
 
-    <!-- External JavaScript -->
-    <script src="js/script.js"></script>
-  </body>
+<script>
+    // JavaScript for handling CRUD operations
+    const API_URL = 'api.php'; // backend API endpoint
+
+    // Get references to the form and buttons
+    // - studentForm is the form for adding/editing students, 
+    // - submitBtn is the button to submit the form, 
+    // - cancelBtn is the button to cancel editing.
+    const form = document.getElementById('studentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    // Fetch and display students on page load
+    document.addEventListener("DOMContentLoaded", fetchStudents);
+
+    // Function to fetch and display students
+    async function fetchStudents() {
+        const response = await fetch(API_URL);
+        const students = await response.json();
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = '';
+
+        students.forEach(student => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.course}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editStudent(${student.id}, '${student.name}', '${student.email}', '${student.course}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteStudent(${student.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Handle Form Submit (Create or Update)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const id = document.getElementById('studentId').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const course = document.getElementById('course').value;
+
+        // Prepare payload and determine method (POST for create, PUT for update)
+        // Payload is a term for the data we are sending to the server. 
+        const payload = { name, email, course };
+        let method = 'POST';
+
+        if (id) {
+            // This means we are updating an existing student, so we include the ID in the payload and change the method to PUT.
+            payload.id = id;
+            method = 'PUT';
+        }
+
+        // fetch API with the appropriate method and payload
+        // This will send the data to the backend API and handle the response.
+        // Allows the web page to talk to the server-side PHP script to perform CRUD operations.
+        const response = await fetch(API_URL, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        // Handle the response from the server
+        const result = await response.json();
+        alert(result.message || result.error);
+        
+        resetForm(); // Clear the form after submission
+        fetchStudents(); // Refresh the student list to show the latest data
+    });
+
+    // Setup form for editing
+    function editStudent(id, name, email, course) {
+        document.getElementById('studentId').value = id;
+        document.getElementById('name').value = name;
+        document.getElementById('email').value = email;
+        document.getElementById('course').value = course;
+        
+        // Change the submit button text and style to indicate update mode
+        submitBtn.innerText = "Update Student"; 
+        submitBtn.style.backgroundColor = "#ffc107";
+        submitBtn.style.color = "black";
+        cancelBtn.style.display = "inline-block";
+    }
+
+    // Delete a student
+    async function deleteStudent(id) {
+        if (confirm("Are you sure you want to delete this student?")) {
+            const response = await fetch(API_URL, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            fetchStudents();
+        }
+    }
+
+    // Reset Form
+    function resetForm() {
+        form.reset();
+        document.getElementById('studentId').value = '';
+        submitBtn.innerText = "Add Student";
+        submitBtn.style.backgroundColor = "#28a745";
+        submitBtn.style.color = "white";
+        cancelBtn.style.display = "none";
+    }
+</script>
+</body>
 </html>
