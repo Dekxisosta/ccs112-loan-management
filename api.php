@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 /**
  * Unified CRUD API for Students, Loans, and Payments.
  *
@@ -29,9 +33,9 @@ header("Access-Control-Allow-Headers: Content-Type");
 // "db" as the host works when this runs inside Docker Compose, where the
 // MySQL container is named "db" on the same network. If running locally
 // without Docker, this would need to be "localhost" or "127.0.0.1" instead.
-$host = "db";
-$user = "root"; 
-$pass = "rootpassword"; 
+$host = "localhost";
+$user = "root";
+$pass = "";
 $dbname = "school_db";
 
 try {
